@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys, getopt
+import sys, getopt, getpass
 from fabric import Connection
 
 def main(argv):
@@ -17,7 +17,7 @@ def main(argv):
     #
     
     try:
-        opts, args = getopt.getopt(argv,"hd:p:u:",["host=","port=","user=","id="])
+        opts, args = getopt.getopt(argv,"hd:p:u:i:",["host=","port=","user=","id="])
     except getopt.GetoptError:
         print(usageInfo)
         exit(1)
@@ -46,15 +46,21 @@ def main(argv):
     if user == '':
         print("Error: No user specified.")
         exit(1)
+
+    #
+    # if an identity is supplied, attempt to obtain the passphrase
+    #
+    identityPassphrase = getpass.getpass()
     
     #
     # attempt to connect using the given parameters
     #
     
-    conn = Connection(host=destinationHost, 
-    port=destinationPort, 
-    user=user, 
-    connect_kwargs={'key_filename':identityFile})
+    if identityFile == '' or identityPassphrase == '':
+        conn = Connection(host=destinationHost, port=destinationPort, user=user)
+    else:
+        conn = Connection(host=destinationHost, port=destinationPort, user=user,
+          connect_kwargs={'key_filename':identityFile,'passphrase':identityPassphrase})
     
     if conn is None:
         print("Error: Unable to initialize Connection object.")
@@ -62,8 +68,14 @@ def main(argv):
     
     print("The following connection was established: ", conn)
 
-    # TODO: add code here to actually execute the commands on the remote
-    #       server and gage the response...
+    # this will attempt to obtain the kernel information and print it to
+    # stdout, and then close the connection
+    result = conn.run("uname -a")
+
+    if result.exited != 0 or result.ok != True:
+        print("Warning: The connection was improper or terminated prematurely.")
+
+    conn.close()
 
 #
 # execute the main function declared above
