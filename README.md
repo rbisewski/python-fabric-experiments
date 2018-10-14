@@ -18,6 +18,11 @@ Linux host.
 Prints the health status of the zpool on a given host, as well as the ZFS
 volume information.
 
+## check-ceph-health.py
+
+Prints health and status information of a given Ceph cluster, assuming a
+default ceph username.
+
 ## TODO
 
 * consider separating out parts into separate functions
