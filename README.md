@@ -13,6 +13,11 @@ Conduct a quick lookup of the kernel version and type of a given Linux host.
 Prints the files and their sizes, in the /var/log/ directory of a given
 Linux host.
 
+## check-zpool.py
+
+Prints the health status of the zpool on a given host, as well as the ZFS
+volume information.
+
 ## TODO
 
 * consider separating out parts into separate functions
